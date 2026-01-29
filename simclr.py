@@ -2,11 +2,13 @@ import logging
 import os
 import sys
 
+
 import torch
 import torch.nn.functional as F
 from torch.cuda.amp import GradScaler, autocast
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
+from datetime import datetime
 from utils import save_config_file, accuracy, save_checkpoint
 
 torch.manual_seed(0)
@@ -19,7 +21,7 @@ class SimCLR(object):
         self.model = kwargs['model'].to(self.args.device)
         self.optimizer = kwargs['optimizer']
         self.scheduler = kwargs['scheduler']
-        self.writer = SummaryWriter()
+        self.writer = SummaryWriter(log_dir = os.path.join("runs", datetime.now().strftime("%b%d_%H_%M_%S")))
         logging.basicConfig(filename=os.path.join(self.writer.log_dir, 'training.log'), level=logging.DEBUG)
         self.criterion = torch.nn.CrossEntropyLoss().to(self.args.device)
 
@@ -65,7 +67,16 @@ class SimCLR(object):
         logging.info(f"Start SimCLR training for {self.args.epochs} epochs.")
         logging.info(f"Training with gpu: {self.args.disable_cuda}.")
 
-        for epoch_counter in range(self.args.epochs):
+        checkpoint_name = 'checkpoint_init_{:04d}.pth.tar'.format(self.args.epochs)
+        save_checkpoint({
+            'epoch': self.args.epochs,
+            'arch': self.args.arch,
+            'state_dict': self.model.state_dict(),
+            'optimizer': self.optimizer.state_dict(),
+        }, is_best=False, filename=os.path.join(self.writer.log_dir, checkpoint_name))
+        logging.info(f"Model checkpoint and metadata has been saved at {self.writer.log_dir}.")
+        
+        for epoch_counter in tqdm(range(self.args.epochs)):
             for images, _ in tqdm(train_loader):
                 images = torch.cat(images, dim=0)
 
@@ -99,7 +110,7 @@ class SimCLR(object):
 
         logging.info("Training has finished.")
         # save model checkpoints
-        checkpoint_name = 'checkpoint_{:04d}.pth.tar'.format(self.args.epochs)
+        checkpoint_name = 'checkpoint_final_{:04d}.pth.tar'.format(self.args.epochs)
         save_checkpoint({
             'epoch': self.args.epochs,
             'arch': self.args.arch,
