@@ -1,0 +1,36 @@
+[project]
+name = "legacy-cv-project"
+version = "0.1.0"
+description = "Migrated environment from conda to uv"
+requires-python = ">=3.11"
+
+dependencies = [
+  "absl-py>=0.9",
+  "cachetools>=4.0",
+  "certifi",
+  "chardet",
+  "google-auth",
+  "google-auth-oauthlib",
+  "grpcio",
+  "idna",
+  "markdown",
+  "numpy>=1.23",
+  "oauthlib",
+  "pillow",
+  "protobuf",
+  "pyasn1",
+  "pyasn1-modules",
+  "pyyaml",
+  "requests",
+  "requests-oauthlib",
+  "rsa",
+  "six",
+  "tensorboard",
+  "urllib3",
+  "werkzeug",
+  "opencv-python",
+
+  # PyTorch (CPU por defecto)
+  "torch",
+  "torchvision"
+]
