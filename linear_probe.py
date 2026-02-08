@@ -160,8 +160,8 @@ def evaluate_linear_probe(encoder: nn.Module, classifier: nn.Module, test_loader
 def main():
     # Configuration
     # Path to pre-trained SimCLR checkpoint
-    checkpoint_path = './runs/Feb08_14_19_57/checkpoint_final_0300.pth.tar' 
-    # Backbone architecture
+    checkpoint_path = './runs/Feb08_23_24_53/checkpoint_final_0300.pth.tar' 
+    # Backbone architectur
     arch = 'resnet50'  
 
     # Output dimension of the projection head during pre-training
