@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import umap
 
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -50,7 +51,20 @@ def reduce_tsne(X, seed=42, perplexity=30.0):
         random_state=seed,
     )
     X2 = tsne.fit_transform(X)
-    return X2, tsne 
+    return X2, tsne
+
+def reduce_umap(X, seed=42, n_neighbors=15, min_dist=0.1, metric="euclidean"):
+  
+    reducer = umap.UMAP(
+        n_components=2,
+        n_neighbors=n_neighbors,
+        min_dist=min_dist,
+        metric=metric,
+        random_state=seed,
+    )
+    X2 = reducer.fit_transform(X)
+    return X2, reducer
+
 
 def plot_2d(X2, y, title, save_path, show=False):
     plt.figure(figsize=(10, 8))
@@ -94,10 +108,13 @@ def main():
     ap.add_argument("--data_dir", default="./datasets")
     ap.add_argument("--split", choices=["train", "test"], default="test",
                     help="Which split to visualize")
-    ap.add_argument("--method", choices=["pca", "tsne"], default="pca")
+    ap.add_argument("--method", choices=["pca", "tsne", "umap"], default="pca")
     ap.add_argument("--n_samples", type=int, default=5000,
                     help="How many samples to visualize (0 = all). For t-SNE use 2000-5000.")
     ap.add_argument("--perplexity", type=float, default=30.0, help="t-SNE perplexity")
+    ap.add_argument("--umap_neighbors", type=int, default=15)
+    ap.add_argument("--umap_min_dist", type=float, default=0.1)
+    ap.add_argument("--umap_metric", type=str, default="euclidean")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--save", default="plots/latent_2d.png")
     ap.add_argument("--show", action="store_true")
@@ -122,9 +139,19 @@ def main():
     
     if args.method == "pca":
         X2, _ = reduce_pca(X, seed=args.seed)
-    else:
+    elif args.method == "tsne":
         X2, _ = reduce_tsne(X, seed=args.seed, perplexity=args.perplexity)
-    
+    elif args.method == "umap":
+        X2, _ = reduce_umap(
+            X,
+            seed=args.seed,
+            n_neighbors=args.umap_neighbors,
+            min_dist=args.umap_min_dist,
+            metric=args.umap_metric,
+        )
+    else:
+        raise ValueError("Unknown method")
+
     title = f"CIFAR-10 latent space ({args.method.upper()}) | {args.split} | arch={args.arch} | n={len(y)}"
     plot_2d(X2, y, title=title, save_path=args.save, show=args.show)
     
