@@ -53,7 +53,7 @@ def get_loaders(batch_size: int, data_dir: str = './datasets', num_workers : int
     transform = transforms.Compose([
         transforms.Resize(32),
         transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+       # transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
     ])
 
     train_dataset = datasets.CIFAR10(root=data_dir, train=True, download=True, transform=transform)
@@ -88,7 +88,7 @@ def train_linear_probe(encoder: nn.Module, classifier: nn.Module,
     n_iter = 0
     # Training loop with tqdm progress bar
     for epoch in tqdm(range(num_epochs), desc="Epochs"):
-        encoder.train() # Parameters are frozen, but set to train mode for BN compatibility
+        encoder.eval() # Parameters are frozen, but set to train mode for BN compatibility
         classifier.train()
         
         total_loss = 0.0
@@ -135,6 +135,7 @@ def train_linear_probe(encoder: nn.Module, classifier: nn.Module,
     torch.save(classifier.state_dict(), classifier_path)
     
 def evaluate_linear_probe(encoder: nn.Module, classifier: nn.Module, test_loader: DataLoader):
+    encoder.eval()
     classifier.eval()
     correct = 0
     total = 0
@@ -159,7 +160,7 @@ def evaluate_linear_probe(encoder: nn.Module, classifier: nn.Module, test_loader
 def main():
     # Configuration
     # Path to pre-trained SimCLR checkpoint
-    checkpoint_path = 'runs/Feb02_18_31_27/checkpoint_final_0300.pth.tar'  
+    checkpoint_path = './runs/Feb08_14_19_57/checkpoint_final_0300.pth.tar' 
     # Backbone architecture
     arch = 'resnet50'  
 
