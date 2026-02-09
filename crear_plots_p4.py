@@ -58,4 +58,4 @@ def subplot_tb_3x1(save_name="part4_tensorboard_3x1.png", seen_paths=True):
 
 if __name__ == "__main__":
     subplot_tsne_2x2()
-    subplot_tb_3x1()
+    # subplot_tb_3x1()
