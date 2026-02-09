@@ -29,6 +29,33 @@ def subplot_tsne_2x2(save_name="part4_tsne_2x2.png"):
     plt.savefig(out_path, dpi=300)
     plt.close()
     print(f"[OK] Saved {out_path}")
+    
+def subplot_tb_3x1(save_name="part4_tensorboard_3x1.png", seen_paths=True):
+    # Pon aquí los nombres EXACTOS de tus capturas (muévelas a /plots o cambia la ruta)
+    # Ejemplo si las guardas en plots/ como:
+    #   tb_top1.png, tb_top5.png, tb_loss.png
+    files = [
+        ("acc_tbd_top1.png", "Training accuracy (Top-1)"),
+        ("acc_tbd_top5.png", "Training accuracy (Top-5)"),
+        ("loss_tbd.png", "Contrastive loss"),
+    ]
+
+    fig, axes = plt.subplots(3, 1, figsize=(16, 14))
+
+    for ax, (fname, title) in zip(axes, files):
+        path = os.path.join(PLOTS_DIR, fname)
+        img = mpimg.imread(path)
+        ax.imshow(img)
+        ax.set_title(title, fontsize=14)
+        ax.axis("off")
+
+    fig.suptitle("SimCLR pretraining curves for different temperatures", fontsize=18)
+    plt.tight_layout(rect=[0, 0.03, 1, 0.96])
+    out_path = os.path.join(PLOTS_DIR, save_name)
+    plt.savefig(out_path, dpi=300)
+    plt.close()
+    print(f"[OK] Saved {out_path}")
 
 if __name__ == "__main__":
     subplot_tsne_2x2()
+    subplot_tb_3x1()
