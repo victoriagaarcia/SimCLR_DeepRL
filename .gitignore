@@ -6,3 +6,5 @@ Dockerfile
 docker-compose.yml
 .env
 *.sh
+crear_plots_p4.py
+crear_plots.py
